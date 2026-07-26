@@ -4,7 +4,7 @@
 // containerEnv, а не remoteEnv: локаль нужна и демонам, и docker exec.
 {
   "name": "blog.cosmdandy.dev DevContainer",
-  "image": "ghcr.io/cosmdandy/devcontainer:core",
+  "image": "ghcr.io/cosmdandy/devcontainer:devops",
   "containerEnv": {
     "LANG": "en_US.UTF-8",
     "LC_ALL": "en_US.UTF-8",
