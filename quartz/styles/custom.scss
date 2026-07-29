@@ -172,33 +172,33 @@ pre {
 }
 
 // ── Переключатель темы ──────────────────────────────────────────────────────
-// Quartz даёт свою кнопку с солнцем и луной; перерисовываем её звездой из
-// фавикона, чтобы блог, визитка и резюме выглядели одинаково. Компонент ядра
-// при этом не тронут — только стили, поэтому обновления Quartz не конфликтуют.
+// Иконки у Quartz свои и они же нам нужны — солнце и луна. Трогаем только
+// оформление кнопки: контрастная плашка, как на визитке и резюме, и общая
+// длительность перекраски. Компонент ядра не тронут, поэтому обновления
+// Quartz тут не конфликтуют.
 //
-// Знак собран из двух масок, а не картинкой: каркас красится переменной темы,
-// звезда заливается градиентом. Цвета остаются в одном месте — здесь.
-//
-// Состояний два, а не три, как на статических сайтах: у Quartz нет режима «по
-// системе» после первого выбора — он запоминает тему и дальше следует ей.
+// Переключение у Quartz двухпозиционное и запоминается само; отдельного
+// «авто» в интерфейсе нет и на статических сайтах теперь тоже.
 
-:root,
-:root[saved-theme="dark"] {
+:root {
+  // Длительность перекраски при смене темы — одна на весь файл, иначе фон,
+  // текст и рамки приезжают вразнобой.
+  --theme-fade: 0.45s cubic-bezier(0.32, 0.72, 0, 1);
+
   --inv-surface: rgba(238, 232, 213, 0.94);
   --inv-line: rgba(88, 110, 117, 0.22);
-  --inv-frame: #657b83;
+  --inv-icon: #657b83;
   --inv-shadow: 0 6px 20px -6px rgba(0, 0, 0, 0.85);
 }
 
 :root[saved-theme="light"] {
   --inv-surface: rgba(7, 54, 66, 0.94);
   --inv-line: rgba(147, 161, 161, 0.22);
-  --inv-frame: #93a1a1;
+  --inv-icon: #93a1a1;
   --inv-shadow: 0 6px 20px -6px rgba(88, 110, 117, 0.35);
 }
 
 .darkmode {
-  position: relative;
   width: 34px;
   height: 34px;
   border-radius: 11px;
@@ -206,54 +206,69 @@ pre {
   background: var(--inv-surface);
   box-shadow: var(--inv-shadow);
   transition:
-    background 0.5s ease,
-    border-color 0.5s ease,
+    background var(--theme-fade),
+    border-color var(--theme-fade),
     transform 0.44s cubic-bezier(0.34, 1.56, 0.64, 1);
 
   &:hover {
     transform: translate3d(0, -1px, 0);
   }
 
-  // Штатные солнце и луна не нужны — вместо них две маски ниже.
   & svg {
-    display: none;
-  }
-
-  &::before,
-  &::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    margin: auto;
-    width: 20px;
-    height: 20px;
-    pointer-events: none;
-  }
-
-  // Каркас из узлов — цветом темы.
-  &::before {
-    background: var(--inv-frame);
-    -webkit-mask: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Cg%20stroke='%23fff'%20stroke-width='0.9'%20fill='none'%3E%3Cline%20x1='12'%20y1='12'%20x2='12'%20y2='4'/%3E%3Cline%20x1='12'%20y1='12'%20x2='18.9'%20y2='8'/%3E%3Cline%20x1='12'%20y1='12'%20x2='18.9'%20y2='16'/%3E%3Cline%20x1='12'%20y1='12'%20x2='12'%20y2='20'/%3E%3Cline%20x1='12'%20y1='12'%20x2='5.1'%20y2='16'/%3E%3Cline%20x1='12'%20y1='12'%20x2='5.1'%20y2='8'/%3E%3C/g%3E%3Cg%20fill='%23fff'%3E%3Ccircle%20cx='12'%20cy='4'%20r='1.25'/%3E%3Ccircle%20cx='18.9'%20cy='8'%20r='1.25'/%3E%3Ccircle%20cx='18.9'%20cy='16'%20r='1.25'/%3E%3Ccircle%20cx='12'%20cy='20'%20r='1.25'/%3E%3Ccircle%20cx='5.1'%20cy='16'%20r='1.25'/%3E%3Ccircle%20cx='5.1'%20cy='8'%20r='1.25'/%3E%3C/g%3E%3C/svg%3E") center / contain no-repeat;
-    mask: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Cg%20stroke='%23fff'%20stroke-width='0.9'%20fill='none'%3E%3Cline%20x1='12'%20y1='12'%20x2='12'%20y2='4'/%3E%3Cline%20x1='12'%20y1='12'%20x2='18.9'%20y2='8'/%3E%3Cline%20x1='12'%20y1='12'%20x2='18.9'%20y2='16'/%3E%3Cline%20x1='12'%20y1='12'%20x2='12'%20y2='20'/%3E%3Cline%20x1='12'%20y1='12'%20x2='5.1'%20y2='16'/%3E%3Cline%20x1='12'%20y1='12'%20x2='5.1'%20y2='8'/%3E%3C/g%3E%3Cg%20fill='%23fff'%3E%3Ccircle%20cx='12'%20cy='4'%20r='1.25'/%3E%3Ccircle%20cx='18.9'%20cy='8'%20r='1.25'/%3E%3Ccircle%20cx='18.9'%20cy='16'%20r='1.25'/%3E%3Ccircle%20cx='12'%20cy='20'%20r='1.25'/%3E%3Ccircle%20cx='5.1'%20cy='16'%20r='1.25'/%3E%3Ccircle%20cx='5.1'%20cy='8'%20r='1.25'/%3E%3C/g%3E%3C/svg%3E") center / contain no-repeat;
-    transition: background 0.5s ease;
-  }
-
-  // Звезда — градиентом, и она же проворачивается при смене темы.
-  &::after {
-    background: linear-gradient(135deg, #ee5c80, #9452cd 55%, #32eeeb);
-    -webkit-mask: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Cpath%20fill='%23fff'%20d='M12%206.6%20C12.45%2010.15%2013.85%2011.55%2017.4%2012%20C13.85%2012.45%2012.45%2013.85%2012%2017.4%20C11.55%2013.85%2010.15%2012.45%206.6%2012%20C10.15%2011.55%2011.45%2010.15%2012%206.6%20Z'/%3E%3C/svg%3E") center / contain no-repeat;
-    mask: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Cpath%20fill='%23fff'%20d='M12%206.6%20C12.45%2010.15%2013.85%2011.55%2017.4%2012%20C13.85%2012.45%2012.45%2013.85%2012%2017.4%20C11.55%2013.85%2010.15%2012.45%206.6%2012%20C10.15%2011.55%2011.45%2010.15%2012%206.6%20Z'/%3E%3C/svg%3E") center / contain no-repeat;
-    transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+    // Иконка должна быть контрастна плашке, а не фону страницы.
+    fill: var(--inv-icon);
+    transition: fill var(--theme-fade);
   }
 }
 
-:root[saved-theme="dark"] .darkmode::after {
-  transform: rotate(180deg);
+// ── Плавная смена темы ──────────────────────────────────────────────────────
+// Quartz переключает тему сменой атрибута на <html> и временного класса для
+// перехода не даёт — он лишь шлёт событие themechange. Навесить обработчик
+// можно только из компонента, а компоненты ядра мы не трогаем, поэтому
+// плавность делается стилями.
+//
+// Переходы точечные, не через `*`: универсальный селектор перебил бы
+// собственные анимации попапов, поиска и подсветки ссылок — у них свои кривые
+// и длительности. Здесь перечислены крупные плоскости, которые и создают
+// ощущение перекраски.
+body,
+.page,
+article,
+.sidebar,
+footer,
+.callout,
+.popover > .popover-inner,
+.search .search-container > .search-space,
+pre,
+code,
+table,
+th,
+td,
+blockquote,
+hr {
+  transition:
+    background-color var(--theme-fade),
+    color var(--theme-fade),
+    border-color var(--theme-fade);
+}
+
+// Подложка и свечение живут на псевдоэлементах html — им переход нужен
+// отдельно, иначе точки и градиент переключаются рывком.
+html::before,
+html::after {
+  transition:
+    background-image var(--theme-fade),
+    opacity var(--theme-fade);
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .darkmode,
-  .darkmode::after {
+  body,
+  .page,
+  article,
+  .sidebar,
+  footer,
+  html::before,
+  html::after {
     transition: none;
   }
 }

@@ -8,3 +8,7 @@ node_modules
 # Проверено на симуляции апгрейда — конфликтовали ровно они.
 quartz/plugins/loader/config-loader.test.ts
 quartz/plugins/pageTypes/dispatcher.test.ts
+
+# Служебный файл сессии: лежит в глобальном gitignore, в репозиторий не идёт,
+# но prettier его всё равно проверял и ронял make check.
+PROGRESS.md
