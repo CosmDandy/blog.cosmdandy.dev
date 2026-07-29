@@ -1,3 +1,10 @@
 public
 node_modules
 .quartz-cache
+
+# Эти два файла приезжают из upstream неотформатированными. Прогнать по ним
+# prettier — значит поймать конфликт при каждом обновлении ядра, которое их
+# задевает: истории upstream у нас нет, и патч ложится на изменённый файл.
+# Проверено на симуляции апгрейда — конфликтовали ровно они.
+quartz/plugins/loader/config-loader.test.ts
+quartz/plugins/pageTypes/dispatcher.test.ts

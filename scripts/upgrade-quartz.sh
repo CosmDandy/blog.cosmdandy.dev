@@ -31,6 +31,7 @@ EXCLUDES=(
   ':(exclude).node-version'
   ':(exclude)content'
   ':(exclude).turbo'
+  ':(exclude).prettierignore'
 )
 
 if [[ -n "$(git status --porcelain)" ]]; then
