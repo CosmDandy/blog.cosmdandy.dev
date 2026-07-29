@@ -28,8 +28,14 @@ export default (() => {
     const iconPath = joinSegments(baseDir, "static/icon.png")
 
     // Url of current page
+    // Правка поверх upstream: для главной joinSegments даёт .../index — адрес,
+    // отдающий ту же страницу, что и корень. Как canonical он отправлял бы
+    // поисковик по кругу, как og:url — подсовывал бы соцсетям дубликат.
+    // Правим здесь, а не в трёх местах ниже, чтобы не трогать JSX ядра.
     const socialUrl =
-      fileData.slug === "404" ? url.toString() : joinSegments(url.toString(), fileData.slug!)
+      fileData.slug === "404" || fileData.slug === "index"
+        ? url.toString()
+        : joinSegments(url.toString(), fileData.slug!)
 
     const usesCustomOgImage = ctx.cfg.plugins.emitters.some((e) => e.name === "CustomOgImages")
     const ogImageDefaultPath = `https://${cfg.baseUrl}/static/og-image.png`
@@ -99,22 +105,17 @@ export default (() => {
             чем поисковик сшивает сущность воедино. */}
         {/* На 404 canonical не ставим: она отдаётся с кодом 404 и
             указывала бы на главную, то есть на чужой адрес. */}
-        {fileData.slug !== "404" && (
-          <link
-            rel="canonical"
-            href={
-              // socialUrl для главной даёт .../index — это дубликат самой
-              // главной, и canonical на него отправил бы поисковик по кругу.
-              fileData.slug === "index" ? url.toString() : socialUrl
-            }
-          />
-        )}
+        {fileData.slug !== "404" && <link rel="canonical" href={socialUrl} />}
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
             __html: JSON.stringify({
               "@context": "https://schema.org",
               "@type": "Person",
+              // Один и тот же @id на всех трёх сайтах. Без него получаются три
+              // независимых Person с похожими полями, и поисковику не за что их
+              // сшить; с ним это одна сущность, у которой три адреса.
+              "@id": "https://cosmdandy.dev/#person",
               name: "Timofey Kondrashin",
               alternateName: "cosmdandy",
               jobTitle: "DevOps Engineer",

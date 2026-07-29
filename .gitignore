@@ -353,3 +353,6 @@ content/.obsidian/
 
 # Профилирование сборки (npm run profile)
 prof/
+
+# Локальный кэш wrangler: состояние dev-сервера и загруженных ассетов.
+.wrangler/
