@@ -13,3 +13,17 @@ updates:
     groups:
       actions:
         patterns: ["*"]
+
+  # Само ядро Quartz приходит merge'ом из upstream, но его зависимости и плагины
+  # @quartz-community/* — обычные npm-пакеты, и обновляются отдельно от ядра.
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+    cooldown:
+      default-days: 7
+    groups:
+      # Одной группой: плагинов больше сорока, поштучные PR дали бы десяток
+      # обновлений в неделю, а проверяются они всё равно одной сборкой.
+      npm:
+        patterns: ["*"]
