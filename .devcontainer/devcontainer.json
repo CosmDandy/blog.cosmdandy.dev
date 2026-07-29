@@ -4,8 +4,11 @@
 // containerEnv, а не remoteEnv: локаль нужна и демонам, и docker exec.
 {
   "name": "blog.cosmdandy.dev DevContainer",
-  "image": "ghcr.io/cosmdandy/devcontainer:devops",
-  "initializeCommand": "docker pull ghcr.io/cosmdandy/devcontainer:devops || true",
+  "image": "ghcr.io/cosmdandy/devcontainer:core",
+  "initializeCommand": "docker pull ghcr.io/cosmdandy/devcontainer:core || true",
+  // 8080 — дев-сервер quartz build --serve, 3001 — его сокет hot-reload.
+  "forwardPorts": [8080, 3001],
+  "postCreateCommand": "npm ci",
   "containerEnv": {
     "LANG": "en_US.UTF-8",
     "LC_ALL": "en_US.UTF-8",
