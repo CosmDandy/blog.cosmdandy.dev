@@ -58,16 +58,25 @@ draft: true
 
 ## Обновление Quartz
 
-Ядро вливается из upstream, а не копируется:
+Ядро влито одним коммитом, истории upstream в репозитории нет — иначе в логе
+блога лежали бы две тысячи чужих коммитов. Версия зафиксирована в
+`.quartz-upstream`.
 
 ```bash
-make upgrade          # покажет, что нового в ветке v5
-git merge upstream/v5
+make upgrade   # дифф между зафиксированным SHA и upstream/v5, применённый поверх
+npm ci         # зависимости могли поменяться
+make build     # проверить, что собирается
 ```
 
+Общей точки истории с upstream нет, поэтому git не сливает обновление сам:
+`make upgrade` применяет патч и при конфликте останавливается, оставляя
+разметку от `git apply -3`. Разбирать конфликт придётся руками — это цена
+чистого лога.
+
 Всё своё лежит в файлах, которых у upstream нет (`quartz.config.yaml`,
-`content/`, `wrangler.jsonc`, `deploy.yaml`), поэтому конфликты возможны только
-в двух местах: `quartz/styles/custom.scss` и иконки в `quartz/static/`.
+`content/`, `wrangler.jsonc`, `deploy.yaml`) либо в явном списке исключений
+внутри `scripts/upgrade-quartz.sh`. Реально конфликтовать могут два места:
+`quartz/styles/custom.scss` и иконки в `quartz/static/`.
 
 ## Что настроено руками в Cloudflare
 

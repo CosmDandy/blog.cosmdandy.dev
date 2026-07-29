@@ -31,10 +31,4 @@ clean: ## Убрать сборку и кэш
 	rm -rf public .quartz-cache
 
 upgrade: ## Подтянуть обновления ядра Quartz из upstream
-	@echo "Смотрим, что нового в ветке v5:"
-	git fetch upstream v5
-	git log --oneline HEAD..upstream/v5 | head -30
-	@echo
-	@echo "Вливать так:  git merge upstream/v5"
-	@echo "Конфликты возможны только в файлах, которые мы правили:"
-	@echo "  quartz/styles/custom.scss, quartz/static/{icon,og-image}.png"
+	./scripts/upgrade-quartz.sh
