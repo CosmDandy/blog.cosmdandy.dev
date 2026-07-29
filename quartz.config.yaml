@@ -71,7 +71,14 @@ plugins:
         - tags
         - aliases
       excludedProperties: []
-      hidePropertiesView: false
+      # Таблица Properties над заметкой не показывается: в хранилище
+      # frontmatter — рабочий инструмент, а на странице блога это шум, тем
+      # более что description и так уходит в meta, а теги видны в списках.
+      #
+      # Плагин при этом остаётся включённым: он же вырезает блок frontmatter
+      # из тела. Выключишь целиком — и «title: … description: …» уедет в текст
+      # статьи и в мета-описание. Проверено сборкой.
+      hidePropertiesView: true
       delimiters: ---
       language: yaml
     order: 5
