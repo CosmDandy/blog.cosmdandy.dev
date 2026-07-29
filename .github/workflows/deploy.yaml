@@ -80,6 +80,22 @@ jobs:
           name: site
           path: public/
 
+      # Секреты нельзя проверить в if: — контекст secrets там недоступен.
+      # Без этого шага отсутствие токена выглядит как невнятная ошибка внутри
+      # wrangler, и непонятно, сломался деплой или не настроен доступ.
+      - name: Проверка доступа к Cloudflare
+        env:
+          TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          ACCOUNT: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          missing=""
+          [ -z "$TOKEN" ] && missing="CLOUDFLARE_API_TOKEN"
+          [ -z "$ACCOUNT" ] && missing="${missing:+$missing, }CLOUDFLARE_ACCOUNT_ID"
+          if [ -n "$missing" ]; then
+            echo "::error::Не задано: $missing. Settings → Secrets and variables → Actions."
+            exit 1
+          fi
+
       - uses: cloudflare/wrangler-action@ebbaa1584979971c8614a24965b4405ff95890e0 # v4.0.0
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
@@ -92,9 +108,16 @@ jobs:
     # Только для PR из этого же репозитория: ветке из форка секреты не
     # достаются, и это правильно — иначе любой желающий получал бы токен,
     # открыв PR. Для форков job просто пропускается.
+    #
+    # Dependabot исключён отдельно: его PR выглядят как внутренние, но секреты
+    # получают из своего хранилища (Settings → Secrets → Dependabot), а не из
+    # Actions. Класть туда копию боевого токена ради превью обновлений
+    # зависимостей не стоит, поэтому превью для него просто не собирается —
+    # сборка в job build его всё равно проверяет.
     if: >-
       github.event_name == 'pull_request' &&
-      github.event.pull_request.head.repo.full_name == github.repository
+      github.event.pull_request.head.repo.full_name == github.repository &&
+      github.actor != 'dependabot[bot]'
     runs-on: ubuntu-24.04
     permissions:
       contents: read
