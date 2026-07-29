@@ -93,6 +93,44 @@ export default (() => {
         <meta name="description" content={description} />
         <meta name="generator" content="Quartz" />
 
+        {/* Правка поверх upstream. Canonical нужен, чтобы страница со слэшем и
+            без него не считались разными; JSON-LD связывает сайт с ником
+            cosmdandy и остальными профилями — по брендовому запросу это то,
+            чем поисковик сшивает сущность воедино. */}
+        {/* На 404 canonical не ставим: она отдаётся с кодом 404 и
+            указывала бы на главную, то есть на чужой адрес. */}
+        {fileData.slug !== "404" && (
+          <link
+            rel="canonical"
+            href={
+              // socialUrl для главной даёт .../index — это дубликат самой
+              // главной, и canonical на него отправил бы поисковик по кругу.
+              fileData.slug === "index" ? url.toString() : socialUrl
+            }
+          />
+        )}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "Person",
+              name: "Timofey Kondrashin",
+              alternateName: "cosmdandy",
+              jobTitle: "DevOps Engineer",
+              url: `https://${cfg.baseUrl}`,
+              email: "i@cosmdandy.dev",
+              sameAs: [
+                "https://cosmdandy.dev",
+                "https://cv.cosmdandy.dev",
+                "https://github.com/CosmDandy",
+                "https://www.linkedin.com/in/cosmdandy",
+                "https://t.me/cosmdandy",
+              ],
+            }),
+          }}
+        />
+
         {css.map((resource) => CSSResourceToStyleElement(resource, true))}
         {js
           .filter((resource) => resource.loadTime === "beforeDOMReady")
