@@ -1,0 +1,27 @@
+// Статика на Cloudflare Workers. Скрипта воркера нет вовсе — только ассеты,
+// поэтому файла точки входа тут не будет: Cloudflare раздаёт public/ напрямую.
+//
+// Почему Workers, а не Pages: Cloudflare с 2025 года ведёт новые проекты
+// именно сюда, а в Pages уходят только исправления.
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "blog-cosmdandy-dev",
+  "compatibility_date": "2026-07-29",
+  "assets": {
+    "directory": "./public",
+
+    // Ради этой строки и выбран Cloudflare. Quartz эмитит posts/foo.html, а не
+    // posts/foo/index.html, и GitHub Pages на /posts/foo/ со слэшем отдаёт 404
+    // — починить это там нечем. Здесь обе формы ведут на одну страницу.
+    "html_handling": "auto-trailing-slash",
+
+    // Несуществующий путь отдаёт наш 404.html с кодом 404, а не пустую
+    // страницу платформы. single-page-application тут не подходит: это не SPA,
+    // и он вернул бы 200 на любой мусорный URL, что ломает индексацию.
+    "not_found_handling": "404-page",
+  },
+
+  "observability": {
+    "enabled": true,
+  },
+}
