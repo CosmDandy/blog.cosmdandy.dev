@@ -1,31 +1,82 @@
-# Шаблон для проектов с DevPod
+# blog.cosmdandy.dev
 
-Этот репозиторий является отправной точкой для проектов при работе с которыми я использую [DevPod](https://devpod.sh/)
+Блог на [Quartz 5](https://github.com/jackyzha0/quartz): markdown из `content/`
+превращается в статический сайт, который отдаётся с Cloudflare Workers.
+
+## Как устроено
+
+| Слой    | Чем сделано                                                    |
+| ------- | -------------------------------------------------------------- |
+| Контент | markdown в `content/`, пишется в Obsidian                      |
+| Движок  | Quartz 5, ядро в `quartz/`, настройки в `quartz.config.yaml`   |
+| Сборка  | GitHub Actions, `.github/workflows/deploy.yaml`                |
+| Хостинг | Cloudflare Workers (static assets), `wrangler.jsonc`           |
+| Домен   | `blog.cosmdandy.dev`, DNS и сертификат — на стороне Cloudflare |
+
+Сборка и деплой разнесены по отдельным job'ам: сборка исполняет код полусотни
+npm-плагинов и потому не должна видеть токен Cloudflare.
+
+## Локально
 
 ```bash
-devpod up git@github.com:CosmDandy/template-devpod.git --id template-devpod-[...] --provider [...]
+make install   # npm ci
+make dev       # localhost:8080 с автоперезагрузкой
+make build     # собрать в public/
+make check     # форматирование
 ```
 
-## [Docker in docker](https://github.com/devcontainers/features/tree/main/src/docker-in-docker)
+`make types` (tsc) сейчас падает на баге самого Quartz: в ветке v5 модуль
+`.quartz/plugins` создаётся только при установке плагинов из git, а у нас они
+приходят из npm. На сборку это не влияет.
 
-```
-  "features": {
-    "ghcr.io/devcontainers/features/docker-in-docker:2": {}
-  },
+Node — версии из `.node-version` (24). В devcontainer уже есть.
+
+## Как писать
+
+Заметки лежат в `content/`, Obsidian открывает эту папку как хранилище.
+
+```yaml
+---
+title: Заголовок
+description: Одно предложение — уйдёт в meta и в превью при наведении
+date: 2026-07-29
+tags:
+  - infra
+draft: true
+---
 ```
 
-## [Docker outside of docker](https://github.com/devcontainers/features/tree/main/src/docker-outside-of-docker)
+- `draft: true` — заметка не собирается вовсе. Публикация = снятие флага.
+- Без `date` дата берётся из git-истории.
+- Шаблон новой заметки — `content/templates/note.md`, сама папка `templates/`
+  в сборку не попадает.
+- Работают вики-ссылки `[[...]]`, коллауты, `==выделение==`, теги, LaTeX,
+  Canvas и Bases — то есть обычная обсидиановская разметка.
 
+Пуш в `master` — и через минуту это на сайте. На pull request собирается
+превью-версия, ссылка появляется в summary прогона.
+
+## Обновление Quartz
+
+Ядро вливается из upstream, а не копируется:
+
+```bash
+make upgrade          # покажет, что нового в ветке v5
+git merge upstream/v5
 ```
-  "mounts": [
-    "source=/var/run/docker.sock,target=/var/run/docker.sock,type=bind"
-  ],
-  "features": {
-    "ghcr.io/devcontainers/features/docker-outside-of-docker:1": {}
-  },
-  "runArgs": [
-    "--privileged",
-    "--pid=host",
-    "--network=host"
-  ],
-```
+
+Всё своё лежит в файлах, которых у upstream нет (`quartz.config.yaml`,
+`content/`, `wrangler.jsonc`, `deploy.yaml`), поэтому конфликты возможны только
+в двух местах: `quartz/styles/custom.scss` и иконки в `quartz/static/`.
+
+## Что настроено руками в Cloudflare
+
+Не хранится в коде и повторяется при переезде:
+
+1. API-токен с правами `Workers Scripts: Edit` и `Workers Routes: Edit` для
+   зоны `cosmdandy.dev`; он и account ID лежат в секретах репозитория как
+   `CLOUDFLARE_API_TOKEN` и `CLOUDFLARE_ACCOUNT_ID`.
+2. Домен `blog.cosmdandy.dev` привязан к воркеру: Workers & Pages → Domains &
+   Routes. DNS-запись создаёт сам Cloudflare.
+3. Cloudflare Web Analytics включена для домена — скрипт подставляется на edge,
+   в HTML аналитики нет.
