@@ -272,3 +272,80 @@ html::after {
     transition: none;
   }
 }
+
+// ── Шрифты ──────────────────────────────────────────────────────────────────
+// Свои субсеты вместо загрузки с Google Fonts. Плагин quartz-fonts качал
+// .ttf — Google отдаёт устаревший формат, когда запрос идёт без заголовков
+// современного браузера, — и это выходило в 2.2 МБ на восемь начертаний.
+// Те же начертания в woff2 с вырезанной латиницей, кириллицей и типографской
+// пунктуацией весят 200 КБ: brotli-сжатие плюс 385 глифов вместо 2852.
+//
+// Побочный выигрыш: сборка больше не ходит в Google при каждом деплое, и
+// шрифт не меняется под нами, когда там обновят версию.
+//
+// Цена: обновление версии шрифта стало ручной операцией. Нарезка —
+// pyftsubset из fonttools, диапазоны те же, что у Google для latin + cyrillic.
+
+@font-face {
+  font-family: "Inter";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("static/fonts/inter-400.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Inter";
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("static/fonts/inter-600.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Inter";
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("static/fonts/inter-700.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Inter";
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: url("static/fonts/inter-400-italic.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Inter";
+  font-style: italic;
+  font-weight: 600;
+  font-display: swap;
+  src: url("static/fonts/inter-600-italic.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Inter";
+  font-style: italic;
+  font-weight: 700;
+  font-display: swap;
+  src: url("static/fonts/inter-700-italic.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "JetBrains Mono";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("static/fonts/jetbrains-mono-400.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "JetBrains Mono";
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("static/fonts/jetbrains-mono-600.woff2") format("woff2");
+}

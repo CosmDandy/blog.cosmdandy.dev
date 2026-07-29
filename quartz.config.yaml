@@ -27,7 +27,7 @@ configuration:
     # selfHosted, а не googleFonts: шрифты скачиваются на этапе сборки и
     # отдаются со своего домена. Ноль сторонних запросов из браузера читателя,
     # и кириллица приезжает вместе с латиницей — писать планируется на обоих.
-    fontOrigin: selfHosted
+    fontOrigin: local
     cdnCaching: false
     typography:
       header: Inter
@@ -169,7 +169,10 @@ plugins:
   - source: "@quartz-community/quartz-fonts"
     enabled: true
     options:
-      fontOrigin: selfHosted
+      # local: плагин ничего не качает и не подключает — шрифты объявлены
+      # своими @font-face в quartz/styles/custom.scss. selfHosted тянул с
+      # Google .ttf на 2.2 МБ вместо 200 КБ в woff2 с субсетом.
+      fontOrigin: local
       header: Inter
       body: Inter
       code: JetBrains Mono
