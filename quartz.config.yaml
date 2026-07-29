@@ -153,7 +153,7 @@ plugins:
   - source: "@quartz-community/latex"
     enabled: true
     options:
-      renderEngine: katex
+      renderEngine: mathjax
     order: 80
 
   # Шрифты задаются здесь, а не в configuration.theme.typography: плагин читает
