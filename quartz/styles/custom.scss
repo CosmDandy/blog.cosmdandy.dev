@@ -1,3 +1,172 @@
 @use "./variables.scss" as *;
 
-// put your custom CSS here!
+// Фирменный слой поверх базовой темы Quartz. Перенесён с cosmdandy.dev, чтобы
+// блог, визитка и резюме читались как один сайт: чёрный фон, точечная сетка,
+// градиентное свечение, стеклянные поверхности и Solarized-акценты.
+//
+// Единственный файл ядра, который мы правим осознанно: в upstream он пустой и
+// существует ровно для этого, поэтому merge с обновлениями Quartz его не
+// задевает. Цвета продублированы в theme.colors в quartz.config.yaml — правки
+// нужны в обоих местах, иначе граф и эксплорер уедут из общей гаммы.
+
+$purple: rgba(120, 40, 220, 0.4);
+$cyan: rgba(0, 220, 255, 0.5);
+
+// ── Подложка ────────────────────────────────────────────────────────────────
+// Точечная сетка и размытое свечение живут на псевдоэлементах html, а не на
+// отдельных div'ах, как на cosmdandy.dev: разметку страниц генерирует Quartz,
+// вставить туда свои узлы можно только правкой компонентов ядра.
+
+html {
+  &::before,
+  &::after {
+    content: "";
+    position: fixed;
+    pointer-events: none;
+    // Ниже контента, но выше фона body.
+    z-index: -1;
+  }
+
+  // Сетка точек с шагом 24px.
+  &::before {
+    inset: 0;
+    background-image: radial-gradient(circle, var(--dots-color) 1px, transparent 1px);
+    background-size: 24px 24px;
+  }
+
+  // Свечение уведено в верхний угол: на визитке оно обрамляет карточку по
+  // центру, но здесь по центру идёт текст, и подсветка под ним мешает читать.
+  &::after {
+    top: -30vh;
+    left: -10vw;
+    width: 70vw;
+    height: 70vh;
+    border-radius: 50%;
+    background: linear-gradient(
+      45deg,
+      rgba(255, 50, 100, 0.45) 0%,
+      rgba(255, 80, 150, 0.3) 25%,
+      rgba(120, 40, 220, 0.18) 50%,
+      rgba(0, 220, 255, 0.3) 75%,
+      rgba(0, 255, 255, 0.45) 100%
+    );
+    filter: blur(160px);
+    opacity: var(--glow-opacity);
+  }
+}
+
+:root {
+  --dots-color: rgba(88, 110, 117, 0.18);
+  --glow-opacity: 0.35;
+  --glass-bg: rgba(253, 246, 227, 0.72);
+  --glass-border: rgba(88, 110, 117, 0.14);
+}
+
+:root[saved-theme="dark"] {
+  --dots-color: rgba(147, 161, 161, 0.25);
+  --glow-opacity: 1;
+  --glass-bg: linear-gradient(180deg, rgba(7, 54, 66, 0.25) 0%, rgba(7, 54, 66, 0.1) 100%);
+  --glass-border: rgba(147, 161, 161, 0.12);
+}
+
+// ── Типографика ─────────────────────────────────────────────────────────────
+
+body {
+  // Цифры одной ширины: даты в списках заметок не пляшут по колонке.
+  font-variant-numeric: tabular-nums;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1,
+h2,
+h3 {
+  letter-spacing: -0.025em;
+}
+
+::selection {
+  background: $purple;
+  color: #ededed;
+}
+
+// ── Интерактив ──────────────────────────────────────────────────────────────
+
+a {
+  transition: color 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  &:focus-visible {
+    outline: 2px solid $cyan;
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
+}
+
+button:focus-visible,
+input:focus-visible {
+  outline: 2px solid $cyan;
+  outline-offset: 2px;
+}
+
+// ── Стеклянные поверхности ──────────────────────────────────────────────────
+// Всё, что всплывает над текстом, получает подложку с cosmdandy.dev: заливка
+// градиентом, тонкая светлая кромка сверху, размытие и глубокая тень.
+
+@mixin glass {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-top-color: rgba(147, 161, 161, 0.2);
+  backdrop-filter: blur(25px);
+  box-shadow:
+    0 0 0 1px rgba(147, 161, 161, 0.04),
+    0 4px 24px -4px rgba(0, 0, 0, 0.7);
+}
+
+.popover > .popover-inner {
+  @include glass;
+  border-radius: 12px;
+}
+
+.callout {
+  @include glass;
+  border-radius: 12px;
+  // Цветная полоса слева остаётся от базовой темы — перекрываем только фон.
+  border-left-width: 3px;
+}
+
+// Панель поиска и её результаты — самая заметная всплывающая поверхность.
+.search .search-container > .search-space {
+  @include glass;
+  border-radius: 12px;
+}
+
+// ── Блоки кода ──────────────────────────────────────────────────────────────
+
+pre {
+  border-radius: 10px;
+}
+
+// ── Доступность ─────────────────────────────────────────────────────────────
+// Всё декоративное движение выключается для тех, кто просил его не показывать.
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+// На узких экранах свечение сжимается: во всю ширину оно съедает контраст
+// текста, а размытие в 160px заметно бьёт по плавности скролла на телефоне.
+@media all and ($mobile) {
+  html::after {
+    top: -20vh;
+    left: -20vw;
+    width: 90vw;
+    height: 40vh;
+    filter: blur(80px);
+  }
+}
