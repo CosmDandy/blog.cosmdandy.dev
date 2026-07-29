@@ -1,0 +1,370 @@
+# yaml-language-server: $schema=./quartz/plugins/quartz-plugins.schema.json
+#
+# Конфигурация блога. Ядро Quartz приходит merge'ом из upstream, а всё своё
+# держим здесь: у upstream этого файла нет вовсе (у него quartz.config.default
+# .yaml), поэтому обновления ядра его не задевают и merge проходит без
+# конфликтов. То же правило действует для content/, wrangler.jsonc и
+# deploy.yml — чем меньше правок внутри quartz/, тем дешевле апгрейд.
+configuration:
+  pageTitle: cosmdandy
+  pageTitleSuffix: ""
+  enableSPA: true
+  enablePopovers: true
+
+  # Cloudflare Web Analytics включается в дашборде и инжектится на edge для
+  # проксированного домена, поэтому в HTML не нужно ни строчки.
+  analytics: null
+
+  locale: en-US
+  baseUrl: blog.cosmdandy.dev
+
+  ignorePatterns:
+    - private
+    - templates
+    - .obsidian
+
+  theme:
+    # selfHosted, а не googleFonts: шрифты скачиваются на этапе сборки и
+    # отдаются со своего домена. Ноль сторонних запросов из браузера читателя,
+    # и кириллица приезжает вместе с латиницей — писать планируется на обоих.
+    fontOrigin: selfHosted
+    cdnCaching: false
+    typography:
+      header: Inter
+      body: Inter
+      code: JetBrains Mono
+
+    # Палитра синхронизирована с quartz/styles/custom.scss и с cosmdandy.dev:
+    # тёмная тема — Solarized-акценты на чёрном, светлая — Solarized Light.
+    # Менять цвета нужно в обоих местах сразу, иначе граф и эксплорер уедут
+    # из общей гаммы.
+    colors:
+      lightMode:
+        light: "#fdf6e3" # base3   — фон страницы
+        lightgray: "#eee8d5" # base2   — границы, разделители
+        gray: "#93a1a1" # base1   — вторичный текст, рёбра графа
+        darkgray: "#586e75" # base01  — основной текст
+        dark: "#073642" # base02  — заголовки
+        secondary: "#268bd2" # blue    — ссылки, активные узлы графа
+        tertiary: "#2aa198" # cyan    — hover
+        highlight: rgba(88, 110, 117, 0.1)
+        textHighlight: "#b5890055"
+      darkMode:
+        light: "#000000" # фон — как на cosmdandy.dev, чистый чёрный
+        lightgray: "#16202400" # границы (прозрачность даёт стеклянный край)
+        gray: "#586e75" # base01
+        darkgray: "#93a1a1" # base1  — основной текст
+        dark: "#eee8d5" # base2  — заголовки
+        secondary: "#2aa198" # cyan   — ссылки
+        tertiary: "#859900" # green  — hover, живая точка
+        highlight: rgba(147, 161, 161, 0.1)
+        textHighlight: "#b5890055"
+
+plugins:
+  # ── Разбор markdown ────────────────────────────────────────────────────────
+  - source: "@quartz-community/note-properties"
+    enabled: true
+    options:
+      includeAll: false
+      includedProperties:
+        - description
+        - tags
+        - aliases
+      excludedProperties: []
+      hidePropertiesView: false
+      delimiters: ---
+      language: yaml
+    order: 5
+    layout:
+      position: beforeBody
+      priority: 15
+      display: all
+
+  # Дата берётся из frontmatter, затем из git-истории, и только потом из
+  # файловой системы: mtime у файла в CI — это время checkout'а, а не правки.
+  # Отсюда же требование fetch-depth: 0 в сборке.
+  - source: "@quartz-community/created-modified-date"
+    enabled: true
+    options:
+      defaultDateType: created
+      priority:
+        - frontmatter
+        - git
+        - filesystem
+    order: 10
+
+  - source: "@quartz-community/syntax-highlighting"
+    enabled: true
+    options:
+      theme:
+        light: solarized-light
+        dark: solarized-dark
+      keepBackground: false
+    order: 20
+
+  - source: "@quartz-community/spacer"
+    enabled: true
+    options: {}
+    order: 25
+    layout:
+      position: left
+      priority: 25
+      display: mobile-only
+
+  - source: "@quartz-community/obsidian-flavored-markdown"
+    enabled: true
+    options:
+      enableInHtmlEmbed: false
+      enableCheckbox: true
+    order: 30
+
+  - source: "@quartz-community/github-flavored-markdown"
+    enabled: true
+    order: 40
+
+  - source: "@quartz-community/unlisted-pages"
+    enabled: true
+    options: {}
+    order: 45
+
+  - source: "@quartz-community/table-of-contents"
+    enabled: true
+    order: 50
+    layout:
+      position: right
+      priority: 30
+
+  - source: "@quartz-community/bases-page"
+    enabled: true
+    options: {}
+    order: 50
+
+  - source: "@quartz-community/crawl-links"
+    enabled: true
+    options:
+      markdownLinkResolution: shortest
+    order: 60
+
+  # Описание для <meta name="description"> и превью при наведении.
+  - source: "@quartz-community/description"
+    enabled: true
+    order: 70
+
+  - source: "@quartz-community/latex"
+    enabled: true
+    options:
+      renderEngine: katex
+    order: 80
+
+  # Шрифты задаются здесь, а не в configuration.theme.typography: плагин читает
+  # свои опции, а typography из конфига до него не доходит — проверено сборкой,
+  # с ним приезжали дефолтные Schibsted Grotesk и Source Sans Pro.
+  - source: "@quartz-community/quartz-fonts"
+    enabled: true
+    options:
+      fontOrigin: selfHosted
+      header: Inter
+      body: Inter
+      code: JetBrains Mono
+      interface: Inter
+
+  # ── Фильтры ────────────────────────────────────────────────────────────────
+  # draft: true в frontmatter — заметка не попадает в сборку. Это и есть
+  # механика черновиков: пишешь в Obsidian, коммитишь, публикуешь снятием флага.
+  - source: "@quartz-community/remove-draft"
+    enabled: true
+
+  # ── Страницы и выдача ──────────────────────────────────────────────────────
+  - source: "@quartz-community/alias-redirects"
+    enabled: true
+
+  - source: "@quartz-community/content-index"
+    enabled: true
+    options:
+      enableSiteMap: true
+      enableRSS: true
+
+  - source: "@quartz-community/favicon"
+    enabled: true
+
+  - source: "@quartz-community/og-image"
+    enabled: true
+
+  - source: "@quartz-community/content-page"
+    enabled: true
+
+  - source: "@quartz-community/folder-page"
+    enabled: true
+
+  - source: "@quartz-community/tag-page"
+    enabled: true
+
+  - source: "@quartz-community/canvas-page"
+    enabled: true
+
+  # ── Компоненты страницы ────────────────────────────────────────────────────
+  - source: "@quartz-community/page-title"
+    enabled: true
+    layout:
+      position: left
+      priority: 10
+
+  - source: "@quartz-community/search"
+    enabled: true
+    layout:
+      position: left
+      priority: 20
+      group: toolbar
+      groupOptions:
+        grow: true
+
+  - source: "@quartz-community/darkmode"
+    enabled: true
+    layout:
+      position: left
+      priority: 30
+      group: toolbar
+
+  - source: "@quartz-community/reader-mode"
+    enabled: true
+    layout:
+      position: left
+      priority: 35
+      group: toolbar
+
+  - source: "@quartz-community/explorer"
+    enabled: true
+    layout:
+      position: left
+      priority: 50
+
+  - source: "@quartz-community/breadcrumbs"
+    enabled: true
+    layout:
+      position: beforeBody
+      priority: 5
+      condition: not-index
+
+  - source: "@quartz-community/article-title"
+    enabled: true
+    layout:
+      position: beforeBody
+      priority: 10
+
+  - source: "@quartz-community/content-meta"
+    enabled: true
+    layout:
+      position: beforeBody
+      priority: 20
+
+  - source: "@quartz-community/graph"
+    enabled: true
+    layout:
+      position: right
+      priority: 10
+
+  - source: "@quartz-community/backlinks"
+    enabled: true
+    layout:
+      position: right
+      priority: 50
+
+  - source: "@quartz-community/footer"
+    enabled: true
+    options:
+      links:
+        cosmdandy.dev: https://cosmdandy.dev
+        CV: https://cv.cosmdandy.dev
+        GitHub: https://github.com/CosmDandy
+        Telegram: https://t.me/cosmdandy
+    layout:
+      position: footer
+      priority: 50
+
+  # ── Выключено, но оставлено видимым ────────────────────────────────────────
+  # Включается сменой одной строки, когда дойдут руки.
+  #
+  # comments: нужны GitHub Discussions в публичном репозитории и giscus-app.
+  - source: "@quartz-community/comments"
+    enabled: false
+    options:
+      provider: giscus
+      options: {}
+    layout:
+      position: afterBody
+      priority: 10
+
+  # cname: файл CNAME нужен GitHub Pages. На Cloudflare домен цепляется к
+  # воркеру в дашборде, файл в выдаче только мешает.
+  - source: "@quartz-community/cname"
+    enabled: false
+
+  - source: "@quartz-community/recent-notes"
+    enabled: false
+
+  - source: "@quartz-community/tag-list"
+    enabled: false
+    layout:
+      position: beforeBody
+      priority: 30
+
+  - source: "@quartz-community/stacked-pages"
+    enabled: false
+    layout:
+      position: afterBody
+      priority: 50
+      display: all
+
+  - source: "@quartz-community/explicit-publish"
+    enabled: false
+
+  - source: "@quartz-community/encrypted-pages"
+    enabled: false
+
+  - source: "@quartz-community/citations"
+    enabled: false
+    order: 85
+
+  - source: "@quartz-community/hard-line-breaks"
+    enabled: false
+    order: 90
+
+  - source: "@quartz-community/ox-hugo"
+    enabled: false
+    order: 91
+
+  - source: "@quartz-community/roam"
+    enabled: false
+    order: 92
+
+  - source: "@quartz-themes/core"
+    enabled: false
+    options:
+      theme: tokyo-night
+      mode: both
+
+layout:
+  groups:
+    toolbar:
+      priority: 35
+      direction: row
+      gap: 0.5rem
+  byPageType:
+    "404":
+      positions:
+        beforeBody: []
+        left: []
+        right: []
+    content: {}
+    folder:
+      exclude:
+        - reader-mode
+      positions:
+        right: []
+    tag:
+      exclude:
+        - reader-mode
+      positions:
+        right: []
+    canvas: {}
+    bases: {}
