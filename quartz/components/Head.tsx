@@ -5,6 +5,45 @@ import { googleFontHref, googleFontSubsetHref } from "../util/theme"
 import { QuartzComponent, QuartzComponentConstructor, QuartzComponentProps } from "./types"
 import { unescapeHTML } from "../util/escape"
 
+// Правка поверх upstream: срок жизни ручного выбора темы.
+//
+// Плагин darkmode хранит выбор в localStorage['theme'] навсегда, и выбранная
+// днём светлая тема встречает ночью, когда система давно ушла в тёмную. Здесь
+// рядом с выбором заводится отметка — когда его сделали и какая тема была
+// тогда у системы, — и выбор снимается, если система с тех пор передумала или
+// если он просто отлежал свои часы. Пустое хранилище плагин понимает как
+// «следуй за системой», так что снятого выбора достаточно.
+//
+// Скрипт обязан стоять выше prescript.js: тот читает localStorage ещё до
+// отрисовки. Поэтому он тут, а не среди beforeDOMLoaded-ресурсов, где порядок
+// зависит от порядка плагинов.
+const themeLifetimeScript = `
+(function () {
+  var LIFE = 4 * 60 * 60 * 1000;
+  function system() {
+    return matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+  }
+  try {
+    if (!(+localStorage.getItem('theme-at') > Date.now() - LIFE)
+        || localStorage.getItem('theme-sys') !== system()) {
+      ['theme', 'theme-at', 'theme-sys'].forEach(function (k) { localStorage.removeItem(k); });
+    }
+  } catch (e) {}
+  // Отметку ведём сами: плагин про неё не знает, зато каждая смена темы видна
+  // по атрибуту saved-theme на <html>. Наблюдателя вешаем после того, как
+  // плагин выставил тему при загрузке, иначе этот первый вызов сошёл бы за
+  // ручной выбор и продлил срок на ровном месте.
+  document.addEventListener('DOMContentLoaded', function () {
+    new MutationObserver(function () {
+      try {
+        localStorage.setItem('theme-at', String(Date.now()));
+        localStorage.setItem('theme-sys', system());
+      } catch (e) {}
+    }).observe(document.documentElement, { attributes: true, attributeFilter: ['saved-theme'] });
+  });
+})();
+`
+
 export default (() => {
   const Head: QuartzComponent = ({
     cfg,
@@ -49,6 +88,7 @@ export default (() => {
       <head>
         <title>{title}</title>
         <meta charSet="utf-8" />
+        <script dangerouslySetInnerHTML={{ __html: themeLifetimeScript }} />
         {coreStylesheet && <link rel="preload" href={coreStylesheet} as="style" />}
         {coreScript && coreScript.contentType === "external" && (
           <link rel="preload" href={coreScript.src} as="script" />
