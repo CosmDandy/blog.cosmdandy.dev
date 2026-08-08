@@ -32,10 +32,10 @@
           font-size="78" fill="#ededed" letter-spacing="-2">Timofey Kondrashin</text>
 
     <text x="80" y="345" font-family="Inter, sans-serif" font-weight="400"
-          font-size="32" fill="#93a1a1">Инфраструктурные заметки</text>
+          font-size="32" fill="#93a1a1">Notes</text>
 
     <text x="80" y="392" font-family="Inter, sans-serif" font-weight="400"
-          font-size="24" fill="#586e75">Kubernetes · Terraform · CI/CD · домашняя лаборатория</text>
+          font-size="24" fill="#586e75">Kubernetes · Terraform · CI/CD · Life</text>
 
     <line x1="80" y1="540" x2="116" y2="540" stroke="#586e75" stroke-width="1.5"/>
     <text x="132" y="546" font-family="Inter, sans-serif" font-weight="400"
