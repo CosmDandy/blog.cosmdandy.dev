@@ -37,7 +37,9 @@ export default (() => {
         ? url.toString()
         : joinSegments(url.toString(), fileData.slug!)
 
-    const usesCustomOgImage = ctx.cfg.plugins.emitters.some((e) => e.name === "CustomOgImages")
+    // Больше не используется: картинка печатается всегда, см. комментарий ниже.
+    // Строка оставлена, чтобы правка поверх upstream была видна одной заменой.
+    void ctx.cfg.plugins.emitters.some((e) => e.name === "CustomOgImages")
     const ogImageDefaultPath = `https://${cfg.baseUrl}/static/og-image.png`
 
     const coreStylesheet = css[0]?.content
@@ -87,17 +89,24 @@ export default (() => {
         <meta property="og:description" content={description} />
         <meta property="og:image:alt" content={description} />
 
-        {!usesCustomOgImage && (
-          <>
-            <meta property="og:image" content={ogImageDefaultPath} />
-            <meta property="og:image:url" content={ogImageDefaultPath} />
-            <meta name="twitter:image" content={ogImageDefaultPath} />
-            <meta
-              property="og:image:type"
-              content={`image/${getFileExtension(ogImageDefaultPath) ?? "png"}`}
-            />
-          </>
-        )}
+        {/* Правка поверх upstream. Условие было `!usesCustomOgImage`: если в
+            сборке числится генератор картинок, страница не печатала og:image
+            вовсе — за него это сделает генератор. У нас генератор числится, но
+            картинок не создаёт: /static/social-images/index.webp отдаёт 404, а
+            в шапке живой страницы остались og:image:width, height и alt — без
+            самой картинки. Мессенджер в таком случае берёт что попало, обычно
+            favicon, и ссылка на блог выглядела иначе, чем на визитку и резюме.
+
+            Своя картинка печатается всегда. Если генератор когда-нибудь
+            заработает, он добавит свою следом — и обе будут указывать на
+            осмысленное изображение, а не одна в никуда. */}
+        <meta property="og:image" content={ogImageDefaultPath} />
+        <meta property="og:image:url" content={ogImageDefaultPath} />
+        <meta name="twitter:image" content={ogImageDefaultPath} />
+        <meta
+          property="og:image:type"
+          content={`image/${getFileExtension(ogImageDefaultPath) ?? "png"}`}
+        />
 
         {cfg.baseUrl && (
           <>
