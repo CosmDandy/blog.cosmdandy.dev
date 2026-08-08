@@ -7,7 +7,12 @@
 # deploy.yml — чем меньше правок внутри quartz/, тем дешевле апгрейд.
 configuration:
   pageTitle: cosmdandy
-  pageTitleSuffix: ""
+  # Суффикс приклеивается только к <title>, og:title и картинке превью — в h1
+  # статьи и в шапке сайта он не появляется (ArticleTitle и PageTitle читают
+  # frontmatter и pageTitle напрямую). Поэтому это ровно тот рычаг, которым
+  # чинится карточка, не трогая видимую страницу: ссылка на любую заметку
+  # разворачивается как «Первая заметка · Timofey Kondrashin», а не безымянной.
+  pageTitleSuffix: " · Timofey Kondrashin"
   enableSPA: true
   enablePopovers: true
 
