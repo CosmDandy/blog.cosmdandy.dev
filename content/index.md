@@ -1,6 +1,6 @@
 ---
 title: cosmdandy
-description: Notes on infrastructure, Kubernetes, CI/CD and everything I break along the way.
+description: Infrastructure notes by Timofey Kondrashin · Kubernetes, Terraform, CI/CD, a home lab and everything I break along the way.
 ---
 
 Инфраструктурные заметки: Kubernetes, Terraform, CI/CD, домашняя лаборатория и то, что ломается по дороге.

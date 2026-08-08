@@ -63,10 +63,22 @@ export default (() => {
             )}
           </>
         )}
-        <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossOrigin="anonymous" />
+        {/* Правка поверх upstream. С cdnjs грузится только mermaid, и только на
+            страницах, где есть диаграмма, — то есть почти никогда. Соединение же
+            открывалось на каждой загрузке и отъедало у телефона DNS, TCP и TLS.
+            А вот с jsdelivr на каждой странице приезжают d3 и pixi для графа
+            (полмегабайта), и туда соединения как раз не было. */}
+        <link rel="preconnect" href="https://cdn.jsdelivr.net" crossOrigin="anonymous" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-        <meta name="og:site_name" content={cfg.pageTitle}></meta>
+        {/* Правка поверх upstream. Первой строкой карточки мессенджер печатает
+            og:site_name, и с pageTitle там оказывался ник «cosmdandy» — по нему
+            непонятно, куда ведёт ссылка, и он же дублировал заголовок, отчего
+            Telegram заголовок просто не показывал. Адрес на этом месте отвечает
+            на вопрос «куда я иду», а заголовок остаётся заголовком.
+            Заодно property вместо name: у Open Graph атрибут именно такой,
+            name работал по снисходительности парсеров. */}
+        <meta property="og:site_name" content={cfg.baseUrl ?? cfg.pageTitle}></meta>
         <meta property="og:title" content={title} />
         <meta property="og:type" content="website" />
         <meta name="twitter:card" content="summary_large_image" />
