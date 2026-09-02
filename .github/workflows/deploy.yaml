@@ -53,6 +53,13 @@ jobs:
       - name: Сборка Quartz
         run: npx quartz build
 
+      # Quartz о _headers не знает и в public/ его не кладёт, а Cloudflare
+      # читает файл только из корня раздачи. Отсюда отдельный шаг: без него
+      # заголовки просто не доедут, и это не будет видно ничем, кроме их
+      # отсутствия в ответе.
+      - name: Заголовки раздачи
+        run: cp _headers public/_headers
+
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: site
