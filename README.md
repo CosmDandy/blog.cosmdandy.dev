@@ -89,3 +89,12 @@ make build     # проверить, что собирается
    Routes. DNS-запись создаёт сам Cloudflare.
 3. Cloudflare Web Analytics включена для домена — скрипт подставляется на edge,
    в HTML аналитики нет.
+
+## Лицензия
+
+Код — MIT: движок Quartz принадлежит [jackyzha0](https://github.com/jackyzha0/quartz),
+мои изменения и конфигурация — Timofey Kondrashin, обе строки в `LICENSE.txt`.
+
+Тексты в `content/` — [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/):
+перепечатка и перевод разрешены с указанием автора и ссылкой на оригинал,
+полный текст в `content/LICENSE`.

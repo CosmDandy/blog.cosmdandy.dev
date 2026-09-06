@@ -292,6 +292,7 @@ plugins:
         CV: https://cv.cosmdandy.dev
         GitHub: https://github.com/CosmDandy
         Telegram: https://t.me/cosmdandy
+        "© 2026 Timofey Kondrashin · CC BY 4.0": https://creativecommons.org/licenses/by/4.0/
     layout:
       position: footer
       priority: 50
