@@ -1,8 +1,8 @@
 # blog.cosmdandy.dev
 
-[![deploy](https://github.com/CosmDandy/blog.cosmdandy.dev/actions/workflows/deploy.yaml/badge.svg)](https://github.com/CosmDandy/blog.cosmdandy.dev/actions/workflows/deploy.yaml)
-[![license](https://img.shields.io/github/license/CosmDandy/blog.cosmdandy.dev)](LICENSE.txt)
-[![content: CC BY 4.0](https://img.shields.io/badge/content-CC%20BY%204.0-lightgrey)](https://creativecommons.org/licenses/by/4.0/)
+[![Open in GitHub Codespaces][codespaces]](https://codespaces.new/CosmDandy/blog.cosmdandy.dev)
+
+[![build][build]](https://github.com/CosmDandy/blog.cosmdandy.dev/actions/workflows/deploy.yaml) [![cloudflare][cloudflare]](https://blog.cosmdandy.dev) [![license][license]](LICENSE.txt) [![content][content]](https://creativecommons.org/licenses/by/4.0/)
 
 Блог на [Quartz 5](https://github.com/jackyzha0/quartz): markdown из `content/`
 превращается в статический сайт, который отдаётся с Cloudflare Workers.
@@ -102,3 +102,9 @@ make build     # проверить, что собирается
 Тексты в `content/` — [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/):
 перепечатка и перевод разрешены с указанием автора и ссылкой на оригинал,
 полный текст в `content/LICENSE`.
+
+[codespaces]: https://github.com/codespaces/badge.svg
+[build]: https://img.shields.io/github/actions/workflow/status/CosmDandy/blog.cosmdandy.dev/deploy.yaml?branch=master&style=flat&label=build&labelColor=21262d&logo=githubactions&logoColor=8b949e
+[cloudflare]: https://img.shields.io/badge/cloudflare-workers-00a8c8?style=flat&labelColor=21262d&logo=cloudflare&logoColor=8b949e
+[license]: https://img.shields.io/github/license/CosmDandy/blog.cosmdandy.dev?style=flat&label=license&labelColor=21262d&color=484f58&logo=opensourceinitiative&logoColor=8b949e
+[content]: https://img.shields.io/badge/content-CC_BY_4.0-484f58?style=flat&labelColor=21262d&logo=creativecommons&logoColor=8b949e
