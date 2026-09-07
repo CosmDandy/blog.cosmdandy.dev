@@ -1,5 +1,9 @@
 # blog.cosmdandy.dev
 
+[![deploy](https://github.com/CosmDandy/blog.cosmdandy.dev/actions/workflows/deploy.yaml/badge.svg)](https://github.com/CosmDandy/blog.cosmdandy.dev/actions/workflows/deploy.yaml)
+[![license](https://img.shields.io/github/license/CosmDandy/blog.cosmdandy.dev)](LICENSE.txt)
+[![content: CC BY 4.0](https://img.shields.io/badge/content-CC%20BY%204.0-lightgrey)](https://creativecommons.org/licenses/by/4.0/)
+
 Блог на [Quartz 5](https://github.com/jackyzha0/quartz): markdown из `content/`
 превращается в статический сайт, который отдаётся с Cloudflare Workers.
 
