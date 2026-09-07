@@ -1,0 +1,19 @@
+cff-version: 1.2.0
+message: If you refer to this work, please cite it as below.
+title: blog.cosmdandy.dev: infrastructure notes
+abstract: >-
+  Infrastructure notes on Kubernetes, Terraform, CI/CD and a home lab, published with Quartz 5 from Cloudflare Workers.
+type: software
+authors:
+  - family-names: Kondrashin
+    given-names: Timofey
+    orcid: null
+    website: https://cosmdandy.dev
+repository-code: https://github.com/CosmDandy/blog.cosmdandy.dev
+url: https://github.com/CosmDandy/blog.cosmdandy.dev
+keywords:
+  - infrastructure
+  - devops
+  - kubernetes
+  - notes
+license: MIT
